@@ -641,6 +641,7 @@ html[data-motion="off"] #preloader{display:none}
   transition:padding .35s var(--ease),border-radius .35s var(--ease),width .35s var(--ease)}
 #player.collapsed{padding:0;width:54px;height:54px;border-radius:50%;overflow:hidden;gap:0;justify-content:center}
 #player.collapsed .p-main{display:none}
+#player:not(.collapsed){width:min(92vw,520px)}
 .p-toggle{width:36px;height:36px;border-radius:50%;border:0;flex:0 0 auto;cursor:pointer;
   background:conic-gradient(var(--accent),#d9b45f,var(--accent));color:#fff;
   font:inherit;font-size:15px;display:grid;place-items:center;transition:background .3s}
@@ -653,7 +654,8 @@ html[data-motion="off"] #preloader{display:none}
 .p-info{min-width:0;max-width:190px}
 .p-info b{display:block;font-size:12px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-info span{font-size:10px;letter-spacing:.2em;color:var(--mute)}
-.p-track{flex:1;height:16px;display:flex;align-items:center;gap:9px;min-width:56px}
+.p-track{flex:1;height:16px;display:flex;align-items:center;gap:9px;min-width:120px}
+.p-info{min-width:0;max-width:190px;flex:0 1 auto}
 .p-rail{width:100%;height:16px;display:flex;align-items:center;position:relative;cursor:pointer;
   touch-action:none}
 .p-rail::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;
