@@ -1,18 +1,14 @@
 /* 站点外部服务配置
  *
- * Giscus 留言板需要你在 GitHub 上准备好这三步，然后把值填进来：
- *   1. 建一个 public 仓库（比如 otarin-site），仓库 Settings → Features 里勾上 Discussions
- *   2. 到 https://github.com/apps/giscus 安装到该仓库
- *   3. 打开 https://giscus.app/zh-CN ，填仓库名，它会给你 repoId / category / categoryId 三个值
- *
- * 填好后留言板自动启用；空着就先显示一句提示，不会报错。
+ * Giscus 留言板（已接入 otarinn.github.io）
+ * 换仓库时到 https://giscus.app/zh-CN 重新生成 repoId / categoryId 填进来即可。
  */
 window.SITE = {
   giscus: {
-    repo: "",          // 例如 "YourName/otarin-site"
-    repoId: "",        // 例如 "R_kgDOxxxxxxx"
+    repo: "otarinn/otarinn.github.io",
+    repoId: "R_kgDOVmFRFQ",
     category: "General",
-    categoryId: "",    // 例如 "DIC_kwDOxxxxxxx"
-    mapping: "pathname" // 每个页面一套评论：pathname
+    categoryId: "DIC_kwDOVmFRFc4DKlVx",
+    mapping: "pathname"
   }
 };
