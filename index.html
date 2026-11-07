@@ -1470,35 +1470,40 @@ window.addEventListener("load", function(){
     function fallbackTilt(el){
       el.style.transform = "perspective(900px) rotateX(-6deg) rotateY(9deg) scale(1.02)";
     }
+    let lastActivate = 0;
     function bindTilt(el){
-      el.addEventListener("click", async ev => {
+      const activate = async ev => {
         if(!isTouch) return;
-        ev.preventDefault();
+        const now = Date.now();
+        if(now - lastActivate < 350) return;
+        lastActivate = now;
+        if(ev && ev.cancelable) ev.preventDefault();
         if(tiltEl === el){ resetTilt(); return; }
         resetTilt();
         tiltEl = el;
         el.classList.add("tilting");
+        /* 先给一个基础角度：即使传感器没数据，点了也能看到 3D */
+        el.style.transform = "perspective(900px) rotateX(-5deg) rotateY(7deg) scale(1.015)";
         if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function"){
           try {
             const p = await DeviceOrientationEvent.requestPermission();
             if(p !== "granted"){
-              resetTilt();
               showTiltTip("没拿到「运动与方向」权限，请在浏览器设置里允许后再点一次。");
               return;
             }
           } catch(_){
-            resetTilt();
             showTiltTip("没拿到「运动与方向」权限，请在浏览器设置里允许后再点一次。");
             return;
           }
         }
         setTimeout(() => {
           if(tiltEl === el && !orientSeen){
-            fallbackTilt(el);
-            showTiltTip("这台设备没有方向传感器，先用固定角度展示。");
+            showTiltTip("这台设备没给方向数据，先用固定角度展示。");
           }
         }, 1500);
-      });
+      };
+      el.addEventListener("click", activate);
+      el.addEventListener("pointerup", ev => { if(ev.pointerType === "touch") activate(ev); });
     }
 
     addEventListener("deviceorientation", ev => {
