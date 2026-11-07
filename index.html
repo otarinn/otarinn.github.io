@@ -357,6 +357,41 @@ footer{letter-spacing:.28em}
   background:color-mix(in srgb,var(--card) 55%,transparent)}
 .giscus-tip b{color:var(--ink-2);font-weight:500}
 
+/* 问题反馈入口 */
+.fb-btn{position:fixed;right:24px;bottom:96px;z-index:96;padding:10px 16px;border-radius:999px;
+  font:inherit;font-size:11px;letter-spacing:.16em;color:var(--mute);cursor:pointer;
+  background:color-mix(in srgb,var(--paper) 90%,transparent);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  box-shadow:0 10px 28px rgba(160,120,140,.18);transition:color .3s,border-color .3s}
+.fb-btn:hover{color:var(--accent);border-color:var(--accent)}
+.fb-panel{position:fixed;right:24px;bottom:142px;z-index:97;width:248px;padding:18px 18px 14px;
+  border-radius:16px;background:var(--card);border:1px solid var(--line);
+  box-shadow:0 20px 50px rgba(160,120,140,.26);font-size:12px}
+.fb-panel[hidden]{display:none}
+.fb-title{font-size:13px;letter-spacing:.1em;margin-bottom:8px}
+.fb-desc{font-size:11px;line-height:1.8;color:var(--mute);margin-bottom:12px}
+.fb-link{display:block;padding:9px 10px;border-radius:10px;font-size:12px;color:var(--ink-2);
+  text-decoration:none;border:1px solid var(--line);margin-bottom:8px}
+.fb-link:hover{color:var(--accent);border-color:var(--accent)}
+.fb-close{width:100%;padding:8px;border:0;background:none;color:var(--mute);
+  font:inherit;font-size:11px;letter-spacing:.16em;cursor:pointer}
+
+/* 音频故障提示 */
+.audio-tip{position:fixed;left:50%;bottom:112px;transform:translateX(-50%) translateY(12px);
+  z-index:98;display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:999px;
+  background:var(--card);border:1px solid var(--line);box-shadow:0 16px 40px rgba(160,120,140,.25);
+  font-size:12px;color:var(--ink-2);opacity:0;pointer-events:none;
+  transition:.35s var(--ease);max-width:92vw}
+.audio-tip.on{opacity:1;pointer-events:auto;transform:translateX(-50%)}
+.audio-tip button,.audio-tip a{font:inherit;font-size:11px;letter-spacing:.1em;color:var(--accent);
+  background:none;border:0;cursor:pointer;text-decoration:none;white-space:nowrap}
+@media(max-width:640px){
+  .fb-btn{right:14px;bottom:92px;padding:9px 14px;font-size:10px}
+  .fb-panel{right:14px;left:14px;width:auto;bottom:138px}
+  .audio-tip{left:14px;right:14px;transform:translateY(12px);border-radius:14px;flex-wrap:wrap}
+  .audio-tip.on{transform:none}
+}
+
 /* 开屏（只加这一项） */
 #preloader{position:fixed;inset:0;z-index:999;display:grid;place-items:center;pointer-events:none;overflow:hidden;
   transition:opacity 1s var(--ease)}
@@ -940,7 +975,16 @@ html[data-motion="off"] #preloader{display:none}
     <button id="playBtn" style="background:none;border:0;color:var(--ink-2);font-size:14px;padding:6px 8px">▶</button>
   </div>
 </div>
-<audio id="audio" preload="none" controlslist="nodownload noremoteplayback"
+<button id="fbBtn" class="fb-btn" type="button">问题反馈</button>
+<div id="fbPanel" class="fb-panel" hidden>
+  <div class="fb-title">遇到问题？</div>
+  <p class="fb-desc">哪里打不开、卡住、没声音，都可以告诉我们。</p>
+  <a class="fb-link" href="mailto:1416585869@qq.com?subject=%E7%BD%91%E7%AB%99%E9%97%AE%E9%A2%98%E5%8F%8D%E9%A6%88">发邮件给御宅</a>
+  <a class="fb-link" href="https://github.com/otarinn/otarinn.github.io/issues/new" target="_blank" rel="noopener">在 GitHub 提 issue</a>
+  <button type="button" class="fb-close">关闭</button>
+</div>
+
+<audio id="audio" preload="auto" playsinline controlslist="nodownload noremoteplayback"
        disablepictureinpicture oncontextmenu="return false" ondragstart="return false"></audio>
 
 <script src="config.js"></script>
@@ -993,6 +1037,22 @@ $("#themeBtn").onclick = () => {
   s.dataset.theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
   s.dataset.lang = "zh-CN";
   box.appendChild(s);
+})();
+
+/* 问题反馈入口 */
+(function(){
+  const btn = document.getElementById("fbBtn");
+  const panel = document.getElementById("fbPanel");
+  if(!btn || !panel) return;
+  const hide = () => { panel.hidden = true; };
+  btn.addEventListener("click", e => { e.stopPropagation(); panel.hidden = !panel.hidden; });
+  const c = panel.querySelector(".fb-close");
+  if(c) c.addEventListener("click", hide);
+  document.addEventListener("click", e => {
+    if(panel.hidden) return;
+    if(panel.contains(e.target) || btn.contains(e.target)) return;
+    hide();
+  });
 })();
 
 /* 联系方式：点击复制号码 */
@@ -1186,6 +1246,27 @@ window.addEventListener("load", function(){
   let ti = -1, playing = false;
   const fmt = s => isFinite(s)&&s>0 ? Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0") : "--:--";
 
+  /* 移动端播放容错：卡住或失败时给出可点提示 */
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  function showAudioTip(msg){
+    let tip = document.getElementById("audioTip");
+    if(!tip){
+      tip = document.createElement("div");
+      tip.id = "audioTip";
+      tip.className = "audio-tip";
+      document.body.appendChild(tip);
+    }
+    tip.innerHTML = "<span>" + msg + "</span>" +
+      '<button type="button" data-a="retry">重试</button>' +
+      '<a href="mailto:1416585869@qq.com?subject=%E7%BD%91%E7%AB%99%E9%9F%B3%E9%A2%91%E9%97%AE%E9%A2%98">反馈</a>';
+    tip.classList.add("on");
+    const b = tip.querySelector('[data-a="retry"]');
+    if(b) b.onclick = () => { tip.classList.remove("on"); playTrack(ti >= 0 ? ti : 0); };
+  }
+  if(audio){
+    audio.addEventListener("error", () => showAudioTip("音频加载失败，可能是网络问题。"));
+  }
+
   /* 音量渐入（BGM 用 3 秒） */
   function fadeIn(au, target, ms){
     if(!au) return;
@@ -1222,14 +1303,19 @@ window.addEventListener("load", function(){
     ti = i;
     audio.src = tracks[i].src;
     audio.loop = !!tracks[i].bgm;
-    if(tracks[i].bgm) fadeIn(audio, .38, 3000);
+    if(tracks[i].bgm){ if(!isIOS) fadeIn(audio, .38, 3000); }
     else audio.volume = .45;
     audio.play().then(()=>{
       playing = true;
       const pb = document.getElementById("playBtn"); if(pb) pb.textContent = "⏸";
       const pt = document.getElementById("playerTitle"); if(pt) pt.textContent = tracks[i].title;
       paintTracks();
-    }).catch(()=>{ playing = false; });
+    }).catch(err => {
+      playing = false;
+      showAudioTip(err && err.name === "NotAllowedError"
+        ? "浏览器拦截了播放，点一下重试。"
+        : "播放失败，点一下重试。");
+    });
   }
 
   if(tl){
