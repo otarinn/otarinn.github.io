@@ -414,6 +414,8 @@ html[data-motion="off"] #preloader{display:none}
 .card3d.tilting,.locked.tilting{
   box-shadow:0 30px 68px rgba(160,120,140,.36);
   border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+/* 触屏点开后，樱花显影保持可见 */
+.locked.tilting .s{opacity:1}
 .go-unlock{position:absolute;right:10px;bottom:10px;z-index:6;font-size:10px;letter-spacing:.14em;
   padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#8a5a66;
   text-decoration:none;line-height:1.2;box-shadow:0 4px 14px rgba(0,0,0,.12)}
@@ -1480,10 +1482,22 @@ window.addEventListener("load", function(){
         /* 不重置 --mx/--my：让樱花停在最后位置原地淡出，否则会在左上角闪一下 */
         el.style.transform = "";
       });
-      el.addEventListener("click", () => {
-        if(coarse) return;
+      el.addEventListener("click", e => {
+        if(coarse){
+          const r = el.getBoundingClientRect();
+          sharp.style.setProperty("--mx", (e.clientX - r.left) + "px");
+          sharp.style.setProperty("--my", (e.clientY - r.top) + "px");
+          return;
+        }
         window.open("http://live.bilibili.com/1817615187", "_blank");
       });
+      el.addEventListener("touchmove", e => {
+        if(!coarse || !el.classList.contains("tilting")) return;
+        const t = e.touches[0]; if(!t) return;
+        const r = el.getBoundingClientRect();
+        sharp.style.setProperty("--mx", (t.clientX - r.left) + "px");
+        sharp.style.setProperty("--my", (t.clientY - r.top) + "px");
+      }, { passive: true });
     });
   })();
 
