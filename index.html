@@ -283,7 +283,11 @@ footer{letter-spacing:.28em}
 
 /* 歌词 */
 .lyrics{margin-top:56px;border-top:1px solid var(--line);padding-top:36px}
-.lyr-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.lyr-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px;cursor:pointer;
+  user-select:none;-webkit-user-select:none}
+.lyr-toggle{margin-left:auto;font-style:normal;font-size:10px;letter-spacing:.22em;color:var(--accent)}
+.lyrics.collapsed .lyr-sec{display:none}
+.lyrics.collapsed .lyr-head{margin-bottom:0}
 .lyr-head b{font-size:20px;font-weight:500;letter-spacing:.04em}
 .lyr-head span{font-size:10px;letter-spacing:.34em;color:var(--mute)}
 .lyr-sec{padding:15px 0;border-top:1px dashed color-mix(in srgb,var(--line) 75%,transparent);
@@ -1400,13 +1404,25 @@ window.addEventListener("load", function(){
     const bgmIdx = tracks.findIndex(t => t.title === "宅萌泪真");
     const mmss = s => Math.floor(s/60) + ":" + String(Math.floor(s%60)).padStart(2,"0");
 
-    box.innerHTML = `<div class="lyr-head"><b>宅萌泪真</b><span>LYRICS</span></div>` +
+    box.innerHTML = `<div class="lyr-head" role="button" tabindex="0">
+        <b>宅萌泪真</b><span>LYRICS</span><i class="lyr-toggle">展开</i>
+      </div>` +
       data.map((sec,i)=>`<div class="lyr-sec" data-i="${i}" data-t="${sec.t}">
         <div class="lyr-time">${mmss(sec.t)}</div>
         ${sec.lines.map(l=>`<div class="lyr-line">
           <span class="jp">${l.jp}</span><span class="ro">${l.ro}</span><span class="zh">${l.zh}</span>
         </div>`).join("")}
       </div>`).join("");
+
+    box.classList.add("collapsed");
+    const lyrHead = box.querySelector(".lyr-head");
+    if(lyrHead){
+      lyrHead.addEventListener("click", () => {
+        const c = box.classList.toggle("collapsed");
+        const t = lyrHead.querySelector(".lyr-toggle");
+        if(t) t.textContent = c ? "展开" : "收起";
+      });
+    }
 
     const secs = Array.from(box.querySelectorAll(".lyr-sec"));
 
@@ -1430,6 +1446,7 @@ window.addEventListener("load", function(){
       if(k === lastK) return;
       lastK = k;
       const on = secs[k]; if(!on) return;
+      if(box.classList.contains("collapsed")) return;
       const r = box.getBoundingClientRect();
       if(r.top < window.innerHeight && r.bottom > 0) on.scrollIntoView({ block: "nearest", behavior: "smooth" });
     });
