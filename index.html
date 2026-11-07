@@ -414,6 +414,8 @@ html[data-motion="off"] #preloader{display:none}
 .locked{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);
   background:var(--card);cursor:pointer;box-shadow:0 12px 32px rgba(160,120,140,.16)}
 .locked img{display:block;width:100%;height:auto}
+.locked .b,.locked .s{display:block;width:100%;aspect-ratio:4/3;
+  background-size:cover;background-position:center;background-repeat:no-repeat}
 .locked .b{filter:blur(16px) saturate(.9) brightness(.92);transform:scale(1.04)}
 .locked .s{position:absolute;inset:0;opacity:0;transition:opacity .25s;
   -webkit-clip-path:circle(0px at 50% 50%);clip-path:circle(0px at 50% 50%)}
@@ -624,6 +626,36 @@ html[data-motion="off"] #preloader{display:none}
   max-width:760px;width:100%;margin:0 auto}
 @media(max-width:720px){
   .hero{min-height:calc(100vh - 66px - 80px) !important}
+}
+
+/* ===== 悬浮播放器（可收起） ===== */
+#player{position:fixed;right:20px;bottom:20px;z-index:95;display:flex;align-items:center;gap:12px;
+  padding:11px 14px;border-radius:18px;max-width:min(92vw,540px);
+  background:color-mix(in srgb,var(--paper) 90%,transparent);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  border:1px solid var(--line);box-shadow:0 14px 40px rgba(160,120,140,.20);
+  transition:padding .35s var(--ease),border-radius .35s var(--ease),width .35s var(--ease)}
+#player.collapsed{padding:0;width:54px;height:54px;border-radius:50%;overflow:hidden;gap:0;justify-content:center}
+#player.collapsed .p-main{display:none}
+.p-toggle{width:36px;height:36px;border-radius:50%;border:0;flex:0 0 auto;cursor:pointer;
+  background:conic-gradient(var(--accent),#d9b45f,var(--accent));color:#fff;
+  font:inherit;font-size:15px;display:grid;place-items:center;transition:background .3s}
+#player:not(.collapsed) .p-toggle{background:none;color:var(--mute);font-size:17px}
+.p-main{display:flex;align-items:center;gap:13px;flex:1;min-width:0}
+.p-info{min-width:0;max-width:190px}
+.p-info b{display:block;font-size:12px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-info span{font-size:10px;letter-spacing:.2em;color:var(--mute)}
+.p-track{flex:1;height:16px;display:flex;align-items:center;min-width:56px}
+.p-rail{width:100%;height:3px;border-radius:3px;position:relative;
+  background:color-mix(in srgb,var(--ink) 12%,transparent)}
+#pbar{position:absolute;left:0;top:0;height:100%;width:0;border-radius:3px;
+  background:linear-gradient(90deg,var(--accent),#d9b45f)}
+.p-btns{display:flex;gap:2px}
+.p-btns button{background:none;border:0;color:var(--ink-2);font:inherit;font-size:14px;
+  padding:6px 8px;cursor:pointer}
+@media(max-width:640px){
+  #player{right:14px;bottom:14px}
+  .p-info{max-width:104px}
 }
 </style>
 
@@ -934,27 +966,20 @@ html[data-motion="off"] #preloader{display:none}
 <div id="lyricFloat" aria-hidden="true"></div>
 
 
-<div id="player" oncontextmenu="return false" style="position:fixed;left:24px;right:24px;bottom:20px;z-index:95;
-  display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:16px;
-  background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(18px);
-  border:1px solid var(--line);box-shadow:0 14px 40px rgba(160,120,140,.18)">
-  <div style="width:36px;height:36px;border-radius:50%;flex:0 0 auto;
-    background:conic-gradient(var(--accent),#d9b45f,var(--accent));display:grid;place-items:center;color:#fff">♪</div>
-  <div style="min-width:0;max-width:200px">
-    <b id="playerTitle" style="display:block;font-size:12px;font-weight:400;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis">未播放</b>
-    <span style="font-size:10px;letter-spacing:.2em;color:var(--mute)">PLAYLIST</span>
-  </div>
-  <div style="flex:1;height:16px;display:flex;align-items:center">
-    <div style="width:100%;height:3px;border-radius:3px;
-      background:color-mix(in srgb,var(--ink) 12%,transparent);position:relative">
-      <div id="pbar" style="position:absolute;left:0;top:0;height:100%;width:0;border-radius:3px;
-        background:linear-gradient(90deg,var(--accent),#d9b45f)"></div>
+<div id="player" class="collapsed" oncontextmenu="return false">
+  <button id="pToggle" class="p-toggle" type="button" aria-label="展开播放器">♪</button>
+  <div class="p-main">
+    <div class="p-info">
+      <b id="playerTitle">未播放</b>
+      <span>PLAYLIST</span>
     </div>
-  </div>
-  <div style="display:flex;gap:2px">
-    <button id="nextTrack" style="background:none;border:0;color:var(--ink-2);font-size:14px;padding:6px 8px">⏭</button>
-    <button id="playBtn" style="background:none;border:0;color:var(--ink-2);font-size:14px;padding:6px 8px">▶</button>
+    <div class="p-track">
+      <div class="p-rail"><div id="pbar"></div></div>
+    </div>
+    <div class="p-btns">
+      <button id="nextTrack" type="button">⏭</button>
+      <button id="playBtn" type="button">▶</button>
+    </div>
   </div>
 </div>
 <audio id="audio" preload="auto" playsinline controlslist="nodownload noremoteplayback"
@@ -1303,6 +1328,11 @@ window.addEventListener("load", function(){
   }
   const pb=document.getElementById("playBtn");
   if(pb) pb.onclick = toggleTrack;
+  const playerEl = document.getElementById("player");
+  const pToggle = document.getElementById("pToggle");
+  if(playerEl && pToggle){
+    pToggle.addEventListener("click", () => playerEl.classList.toggle("collapsed"));
+  }
   const nb=document.getElementById("nextTrack");
   if(nb) nb.onclick = ()=>{ if(tracks.length) playTrack((ti+1)%tracks.length); };
 
@@ -1418,8 +1448,8 @@ window.addEventListener("load", function(){
     box.innerHTML = WORKS.map((w,i)=> w.locked ? `
         <div class="locked" data-i="${i}">
           <span class="badge">未解锁</span>
-          <img class="b" src="${w.src}" alt="" draggable="false">
-          <img class="s" src="${w.src}" alt="" draggable="false">
+          <div class="b" style="background-image:url('${w.src}')"></div>
+          <div class="s" style="background-image:url('${w.src}')"></div>
           <div class="t">${w.title}${w.credit ? '<em class="t-credit">'+w.credit+'</em>' : ''}</div>
         </div>` : `
         <div class="card3d" data-i="${i}">
