@@ -1,0 +1,8 @@
+# 本地素材，不进仓库（67 MB 表情包，页面已不再使用）
+assets/stickers/
+
+# 系统与临时文件
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
