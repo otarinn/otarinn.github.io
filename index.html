@@ -416,9 +416,6 @@ html[data-motion="off"] #preloader{display:none}
   border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
 /* 触屏点开后，樱花显影保持可见 */
 .locked.tilting .s{opacity:1}
-.go-unlock{position:absolute;right:10px;bottom:10px;z-index:6;font-size:10px;letter-spacing:.14em;
-  padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#8a5a66;
-  text-decoration:none;line-height:1.2;box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .locked:hover .b{filter:blur(7px) saturate(.95) brightness(.96)}
 @media(max-width:900px){.works{grid-template-columns:1fr}}
 
@@ -1384,8 +1381,6 @@ window.addEventListener("load", function(){
           <img class="b" src="${w.src}" alt="" draggable="false">
           <img class="s" src="${w.src}" alt="" draggable="false">
           <div class="t">${w.title}</div>
-          <a class="go-unlock" href="http://live.bilibili.com/1817615187" target="_blank"
-             rel="noopener" onclick="event.stopPropagation()">上舰解锁 →</a>
         </div>` : `
         <div class="card3d" data-i="${i}">
           <img src="${w.src}" alt="${w.title}" draggable="false">
@@ -1483,13 +1478,9 @@ window.addEventListener("load", function(){
         el.style.transform = "";
       });
       el.addEventListener("click", e => {
-        if(coarse){
-          const r = el.getBoundingClientRect();
-          sharp.style.setProperty("--mx", (e.clientX - r.left) + "px");
-          sharp.style.setProperty("--my", (e.clientY - r.top) + "px");
-          return;
-        }
-        window.open("http://live.bilibili.com/1817615187", "_blank");
+        const r = el.getBoundingClientRect();
+        sharp.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        sharp.style.setProperty("--my", (e.clientY - r.top) + "px");
       });
       el.addEventListener("touchmove", e => {
         if(!coarse || !el.classList.contains("tilting")) return;
