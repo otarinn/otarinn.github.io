@@ -425,6 +425,8 @@ html[data-motion="off"] #preloader{display:none}
   background:linear-gradient(transparent,rgba(24,16,20,.5));color:#fff;font-size:12px;letter-spacing:.1em}
 
 /* 触屏：点击进入水平仪倾斜 */
+.t-credit{display:block;font-style:normal;font-size:10px;letter-spacing:.14em;
+  opacity:.8;margin-top:3px}
 .card3d.tilting,.locked.tilting{
   box-shadow:0 30px 68px rgba(160,120,140,.36);
   border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
@@ -1418,7 +1420,7 @@ window.addEventListener("load", function(){
           <span class="badge">未解锁</span>
           <img class="b" src="${w.src}" alt="" draggable="false">
           <img class="s" src="${w.src}" alt="" draggable="false">
-          <div class="t">${w.title}</div>
+          <div class="t">${w.title}${w.credit ? '<em class="t-credit">'+w.credit+'</em>' : ''}</div>
         </div>` : `
         <div class="card3d" data-i="${i}">
           <img src="${w.src}" alt="${w.title}" draggable="false">
@@ -1441,15 +1443,36 @@ window.addEventListener("load", function(){
       '</g></svg>');
 
     /* 触屏设备：点击卡片 → 水平仪 3D，随手机倾斜摇摆 */
-    const coarse = matchMedia("(pointer: coarse)").matches;
-    let tiltEl = null;
+    const isTouch = matchMedia("(pointer: coarse)").matches
+      || "ontouchstart" in window
+      || (navigator.maxTouchPoints || 0) > 0;
+    const coarse = isTouch;
+    let tiltEl = null, orientSeen = false;
+
     function resetTilt(){
       if(tiltEl){ tiltEl.style.transform = ""; tiltEl.classList.remove("tilting"); }
       tiltEl = null;
     }
+    function showTiltTip(msg){
+      let t = document.getElementById("tiltTip");
+      if(!t){
+        t = document.createElement("div");
+        t.id = "tiltTip";
+        t.className = "audio-tip";
+        t.style.zIndex = "99";
+        document.body.appendChild(t);
+      }
+      t.innerHTML = "<span>" + msg + "</span>";
+      t.classList.add("on");
+      clearTimeout(showTiltTip._t);
+      showTiltTip._t = setTimeout(() => t.classList.remove("on"), 4200);
+    }
+    function fallbackTilt(el){
+      el.style.transform = "perspective(900px) rotateX(-6deg) rotateY(9deg) scale(1.02)";
+    }
     function bindTilt(el){
       el.addEventListener("click", async ev => {
-        if(!coarse) return;
+        if(!isTouch) return;
         ev.preventDefault();
         if(tiltEl === el){ resetTilt(); return; }
         resetTilt();
@@ -1458,21 +1481,35 @@ window.addEventListener("load", function(){
         if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function"){
           try {
             const p = await DeviceOrientationEvent.requestPermission();
-            if(p !== "granted") resetTilt();
-          } catch(_){ resetTilt(); }
+            if(p !== "granted"){
+              resetTilt();
+              showTiltTip("没拿到「运动与方向」权限，请在浏览器设置里允许后再点一次。");
+              return;
+            }
+          } catch(_){
+            resetTilt();
+            showTiltTip("没拿到「运动与方向」权限，请在浏览器设置里允许后再点一次。");
+            return;
+          }
         }
+        setTimeout(() => {
+          if(tiltEl === el && !orientSeen){
+            fallbackTilt(el);
+            showTiltTip("这台设备没有方向传感器，先用固定角度展示。");
+          }
+        }, 1500);
       });
     }
-    if(coarse){
-      addEventListener("deviceorientation", ev => {
-        if(!tiltEl) return;
-        const b = ev.beta || 0, g = ev.gamma || 0;
-        const rx = Math.max(-9, Math.min(9, -b * 0.14));
-        const ry = Math.max(-11, Math.min(11, g * 0.16));
-        tiltEl.style.transform = "perspective(900px) rotateX(" + rx.toFixed(2) +
-          "deg) rotateY(" + ry.toFixed(2) + "deg) scale(1.012)";
-      });
-    }
+
+    addEventListener("deviceorientation", ev => {
+      orientSeen = true;
+      if(!tiltEl) return;
+      const b = ev.beta || 0, g = ev.gamma || 0;
+      const rx = Math.max(-9, Math.min(9, -b * 0.14));
+      const ry = Math.max(-11, Math.min(11, g * 0.16));
+      tiltEl.style.transform = "perspective(900px) rotateX(" + rx.toFixed(2) +
+        "deg) rotateY(" + ry.toFixed(2) + "deg) scale(1.012)";
+    });
 
     /* 已解锁卡：3D 倾斜 */
     box.querySelectorAll(".card3d").forEach(car => {
