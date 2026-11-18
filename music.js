@@ -8,5 +8,5 @@ window.MUSIC=[
   {group:"游戏 BGM", title:"君のせいだよ、全部", src:"assets/music/track_07.mp3", dur:164, size:2478147},
   {group:"游戏 BGM", title:"柔らかくて壊れそう", src:"assets/music/track_08.mp3", dur:77, size:1248807},
   {group:"游戏 BGM", title:"希望という名の絶望", src:"assets/music/track_09.mp3", dur:160, size:2673030}
-  ,{group:"原创 BGM", title:"宅萌泪真", src:"assets/music/bgm-zhaimeng.mp3", dur:269, size:6453657, bgm:true}
+  ,{group:"原创 BGM", title:"痛いの、飛んでけ", src:"assets/music/bgm-zhaimeng.mp3", dur:269, size:6453657, bgm:true}
 ];

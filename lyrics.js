@@ -1,6 +1,6 @@
 /* 歌词数据：t = 该段起始秒数 */
 window.LYRICS = {
-  "宅萌泪真": [
+  "痛いの、飛んでけ": [
     { t: 30, lines: [
       { jp:"どうしましたか?",                          ro:"dou shimashita ka?",                 zh:"怎么了呢" },
       { jp:"先生、胸が痛いですね",                      ro:"sensei, mune ga itai desu ne",       zh:"医生 胸口痛呢" },
