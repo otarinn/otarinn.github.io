@@ -1413,14 +1413,14 @@ window.addEventListener("load", function(){
   (function(){
     const box = document.getElementById("lyricsBox");
     const LYR = window.LYRICS || {};
-    const data = LYR["宅萌泪真"];
+    const data = LYR["痛いの、飛んでけ"];
     if(!box || !data) return;
 
-    const bgmIdx = tracks.findIndex(t => t.title === "宅萌泪真");
+    const bgmIdx = tracks.findIndex(t => t.title === "痛いの、飛んでけ");
     const mmss = s => Math.floor(s/60) + ":" + String(Math.floor(s%60)).padStart(2,"0");
 
     box.innerHTML = `<div class="lyr-head" role="button" tabindex="0">
-        <b>宅萌泪真</b><span>LYRICS</span><i class="lyr-toggle">展开</i>
+        <b>痛いの、飛んでけ</b><span>LYRICS</span><i class="lyr-toggle">展开</i>
       </div>` +
       data.map((sec,i)=>`<div class="lyr-sec" data-i="${i}" data-t="${sec.t}">
         <div class="lyr-time">${mmss(sec.t)}</div>
