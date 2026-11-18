@@ -283,7 +283,11 @@ footer{letter-spacing:.28em}
 
 /* 歌词 */
 .lyrics{margin-top:56px;border-top:1px solid var(--line);padding-top:36px}
-.lyr-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.lyr-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px;cursor:pointer;
+  user-select:none;-webkit-user-select:none}
+.lyr-toggle{margin-left:auto;font-style:normal;font-size:10px;letter-spacing:.22em;color:var(--accent)}
+.lyrics.collapsed .lyr-sec{display:none}
+.lyrics.collapsed .lyr-head{margin-bottom:0}
 .lyr-head b{font-size:20px;font-weight:500;letter-spacing:.04em}
 .lyr-head span{font-size:10px;letter-spacing:.34em;color:var(--mute)}
 .lyr-sec{padding:15px 0;border-top:1px dashed color-mix(in srgb,var(--line) 75%,transparent);
@@ -637,20 +641,26 @@ html[data-motion="off"] #preloader{display:none}
   transition:padding .35s var(--ease),border-radius .35s var(--ease),width .35s var(--ease)}
 #player.collapsed{padding:0;width:54px;height:54px;border-radius:50%;overflow:hidden;gap:0;justify-content:center}
 #player.collapsed .p-main{display:none}
+#player:not(.collapsed){width:min(92vw,520px)}
 .p-toggle{width:36px;height:36px;border-radius:50%;border:0;flex:0 0 auto;cursor:pointer;
   background:conic-gradient(var(--accent),#d9b45f,var(--accent));color:#fff;
   font:inherit;font-size:15px;display:grid;place-items:center;transition:background .3s}
+/* 收起时：圆钮外圈就是播放进度 */
+#player.collapsed .p-toggle{width:40px;height:40px;
+  background:conic-gradient(var(--accent) 0deg, var(--accent) var(--prog,0deg),
+    color-mix(in srgb,var(--ink) 16%,transparent) var(--prog,0deg))}
 #player:not(.collapsed) .p-toggle{background:none;color:var(--mute);font-size:17px}
 .p-main{display:flex;align-items:center;gap:13px;flex:1;min-width:0}
 .p-info{min-width:0;max-width:190px}
 .p-info b{display:block;font-size:12px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-info span{font-size:10px;letter-spacing:.2em;color:var(--mute)}
-.p-track{flex:1;height:16px;display:flex;align-items:center;gap:9px;min-width:56px}
+.p-track{flex:1;height:16px;display:flex;align-items:center;gap:9px;min-width:120px}
+.p-info{min-width:0;max-width:190px;flex:0 1 auto}
 .p-rail{width:100%;height:16px;display:flex;align-items:center;position:relative;cursor:pointer;
   touch-action:none}
-.p-rail::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;
-  border-radius:3px;background:color-mix(in srgb,var(--ink) 12%,transparent)}
-#pbar{position:absolute;left:0;top:50%;height:3px;margin-top:-1.5px;width:0;border-radius:3px;
+.p-rail::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;
+  border-radius:3px;background:color-mix(in srgb,var(--ink) 14%,transparent)}
+#pbar{position:absolute;left:0;top:50%;height:4px;margin-top:-2px;width:0;border-radius:3px;
   background:linear-gradient(90deg,var(--accent),#d9b45f);pointer-events:none}
 .p-time{font-size:10px;letter-spacing:.06em;color:var(--mute);white-space:nowrap;
   font-variant-numeric:tabular-nums}
@@ -971,7 +981,8 @@ html[data-motion="off"] #preloader{display:none}
 
 
 <div id="player" class="collapsed" oncontextmenu="return false">
-  <button id="pToggle" class="p-toggle" type="button" aria-label="展开播放器">♪</button>
+  <button id="pToggle" class="p-toggle" type="button" aria-label="展开播放器"
+          title="点开可以调进度、切歌">♪</button>
   <div class="p-main">
     <div class="p-info">
       <b id="playerTitle">未播放</b>
@@ -1230,6 +1241,8 @@ window.addEventListener("load", function(){
       if (bar && _au.duration) bar.style.width = (_au.currentTime/_au.duration*100) + "%";
       const t = document.getElementById("ptime");
       if (t && !dragSeeking) t.textContent = mmss(_au.currentTime) + " / " + mmss(_au.duration);
+      const pl = document.getElementById("player");
+      if (pl && _au.duration) pl.style.setProperty("--prog", (_au.currentTime/_au.duration*360).toFixed(1) + "deg");
     });
   }
 
@@ -1346,6 +1359,12 @@ window.addEventListener("load", function(){
       const pb = document.getElementById("playBtn"); if(pb) pb.textContent = "⏸";
       const pt = document.getElementById("playerTitle"); if(pt) pt.textContent = tracks[i].title;
       paintTracks();
+      const pl = document.getElementById("player");
+      if(pl && !pl.dataset.seen){
+        pl.dataset.seen = "1";
+        pl.classList.remove("collapsed");
+        setTimeout(()=> pl.classList.add("collapsed"), 5000);
+      }
     }).catch(err => {
       playing = false;
       showAudioTip(err && err.name === "NotAllowedError"
@@ -1400,13 +1419,25 @@ window.addEventListener("load", function(){
     const bgmIdx = tracks.findIndex(t => t.title === "宅萌泪真");
     const mmss = s => Math.floor(s/60) + ":" + String(Math.floor(s%60)).padStart(2,"0");
 
-    box.innerHTML = `<div class="lyr-head"><b>宅萌泪真</b><span>LYRICS</span></div>` +
+    box.innerHTML = `<div class="lyr-head" role="button" tabindex="0">
+        <b>宅萌泪真</b><span>LYRICS</span><i class="lyr-toggle">展开</i>
+      </div>` +
       data.map((sec,i)=>`<div class="lyr-sec" data-i="${i}" data-t="${sec.t}">
         <div class="lyr-time">${mmss(sec.t)}</div>
         ${sec.lines.map(l=>`<div class="lyr-line">
           <span class="jp">${l.jp}</span><span class="ro">${l.ro}</span><span class="zh">${l.zh}</span>
         </div>`).join("")}
       </div>`).join("");
+
+    box.classList.add("collapsed");
+    const lyrHead = box.querySelector(".lyr-head");
+    if(lyrHead){
+      lyrHead.addEventListener("click", () => {
+        const c = box.classList.toggle("collapsed");
+        const t = lyrHead.querySelector(".lyr-toggle");
+        if(t) t.textContent = c ? "展开" : "收起";
+      });
+    }
 
     const secs = Array.from(box.querySelectorAll(".lyr-sec"));
 
@@ -1430,6 +1461,7 @@ window.addEventListener("load", function(){
       if(k === lastK) return;
       lastK = k;
       const on = secs[k]; if(!on) return;
+      if(box.classList.contains("collapsed")) return;
       const r = box.getBoundingClientRect();
       if(r.top < window.innerHeight && r.bottom > 0) on.scrollIntoView({ block: "nearest", behavior: "smooth" });
     });
