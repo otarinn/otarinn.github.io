@@ -152,8 +152,8 @@ section.block{padding:96px 0;border-top:1px solid var(--line)}
 .acc summary .plus{margin-left:auto;color:var(--mute);font-size:14px;transition:.3s}
 .acc[open] summary{color:var(--accent)}
 .acc[open] summary .plus{transform:rotate(45deg)}
-.acc .inner{padding:0 4px 34px;max-width:56em}
-.acc .inner p{font-size:15px;color:var(--ink-2);text-indent:2em;line-height:2;margin-bottom:.7em}
+.acc .inner{padding:0 4px 34px;max-width:46em;margin:0 auto}
+.acc .inner p{font-size:15px;color:var(--ink-2);line-height:2;margin-bottom:.7em}
 .map-box{border:1px solid var(--line);overflow:hidden;position:relative;background:var(--card)}
 .map-box{border-radius:16px;transition:box-shadow .5s var(--ease),border-color .4s;perspective:1400px}
 .map-box img{display:block;width:100%;transition:filter .5s var(--ease)}
@@ -329,15 +329,28 @@ footer{letter-spacing:.28em}
 }
 @media(max-width:900px){#lyricFloat{display:none}}
 
-.tl{position:relative;padding-left:26px}
-.tl:before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:1px;
-  background:linear-gradient(var(--accent),transparent)}
-.tl-item{position:relative;padding-bottom:30px}
-.tl-item:before{content:"";position:absolute;left:-23px;top:9px;width:7px;height:7px;border-radius:50%;
-  background:var(--accent)}
-.tl-item .date{font-size:10px;letter-spacing:.26em;color:var(--mute);margin-bottom:6px}
+.tl{position:relative;padding-left:0}
+  .tl:before{content:"";position:absolute;left:50%;top:20px;bottom:20px;
+    border-left:1px dashed rgba(224,115,136,.22);transform:translateX(-50%)}
+
+.tl-item{position:relative;z-index:1;padding:30px 36px 26px;margin:0 auto 46px;max-width:620px;
+    background:#faf3e8;color:#3a322f;border-radius:8px;
+    box-shadow:0 4px 18px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.4) inset;
+    transform:rotate(0deg);text-align:center;transition:all .35s cubic-bezier(.2,.8,.3,1)}
+  
+  
+  .tl-item:hover{transform:rotate(-1.8deg) translateY(-4px);
+    box-shadow:0 16px 44px rgba(0,0,0,.45);
+    will-change:transform;-webkit-font-smoothing:antialiased;
+    backface-visibility:hidden;transform-origin:center center}
+  .tl-item:nth-child(even):hover{transform:rotate(1.8deg) translateY(-4px)}
+
+.tl-item .date{display:inline-block;font-size:12px;letter-spacing:.2em;color:#c0556a;
+    margin:0 auto 10px auto;padding:0;background:none;border:none;text-align:center;
+    font-weight:600;border-bottom:1px dashed rgba(184,71,92,.4);padding-bottom:6px}
+  .tl-item .date:before{content:"·";margin-right:8px;font-size:16px;vertical-align:middle}
 .tl-item h3{font-size:16px;font-weight:500;margin-bottom:6px}
-.tl-item p{font-size:13px;color:var(--ink-2);line-height:1.9}
+.tl-item p{font-size:13.5px;color:#4a3f3a;line-height:2.0;letter-spacing:.02em}
 .tl-item .tag{display:inline-block;margin-top:8px;font-size:10px;letter-spacing:.18em;
   color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);
   padding:2px 9px;border-radius:999px}
@@ -464,9 +477,14 @@ html[data-motion="off"] #preloader{display:none}
 .book-hero{display:grid;grid-template-columns:188px 1fr;gap:34px;align-items:center;
   padding:26px;border:1px solid var(--line);border-radius:20px;background:var(--card);
   box-shadow:0 14px 38px rgba(160,120,140,.12)}
-.bh-cover img{width:100%;border-radius:12px;display:block;
+.bh-cover{position:relative}
+  .bh-cover::after{content:"";position:absolute;inset:-14px;z-index:-1;
+    background:radial-gradient(circle,rgba(224,115,136,.16),transparent 70%);filter:blur(22px)}
+  .bh-cover img{width:100%;border-radius:12px;display:block;
   box-shadow:0 12px 28px rgba(160,120,140,.22)}
-.bh-body h2{font-size:clamp(20px,2.4vw,28px);font-weight:500;letter-spacing:.03em;margin-bottom:10px}
+.bh-body h2{font-size:clamp(20px,2.4vw,28px);font-weight:500;letter-spacing:.03em;margin-bottom:10px;
+    background:linear-gradient(135deg,var(--ink) 20%,var(--accent) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .bh-sub{font-size:11px;letter-spacing:.24em;color:var(--mute);margin-bottom:16px}
 .bh-body p{font-size:14px;color:var(--ink-2);line-height:2;margin-bottom:8px;max-width:40em}
 .bh-stats{margin-top:16px;font-size:11px;letter-spacing:.18em;color:var(--mute)}
@@ -582,11 +600,14 @@ html[data-motion="off"] #preloader{display:none}
 .hero{min-height:calc(100vh - 66px);display:grid;place-items:center;
   padding:60px 24px 40px;position:relative;text-align:center}
 .hero::before{display:none}
-.hero-inner{max-width:760px;width:100%}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% 38%,rgba(224,115,136,.10),transparent 55%),
+             radial-gradient(ellipse at 72% 72%,rgba(217,180,95,.06),transparent 50%)}
+.hero-inner{max-width:760px;width:100%;position:relative;z-index:1}
 .hero-top{display:flex;align-items:center;justify-content:center;gap:16px;
   font-size:9.5px;letter-spacing:.55em;color:var(--mute);margin-bottom:46px}
 .hero-top span{flex:1;max-width:110px;height:1px;background:var(--line)}
-.hero-name{font-size:clamp(56px,10vw,120px);line-height:1;font-weight:300;
+.hero-name{font-size:clamp(56px,10vw,120px);line-height:1;font-weight:300;text-shadow:0 0 70px rgba(224,115,136,.18);
   letter-spacing:.12em;padding-left:.12em;margin-bottom:14px}
 .hero-name span{color:var(--accent)}
 .hero-latin{font-size:clamp(11px,1.1vw,13px);letter-spacing:.62em;color:var(--mute);
@@ -671,6 +692,43 @@ html[data-motion="off"] #preloader{display:none}
   #player{right:14px;bottom:14px}
   .p-info{max-width:104px}
 }
+
+/* 目录项 hover */
+.list a{transition:background .3s,transform .3s}
+.list a:hover{background:rgba(224,115,136,.06);transform:translateX(4px)}
+
+/* 设定集美化 */
+.acc .inner{padding:22px 0 10px}
+.acc .inner p{text-align:left;line-height:2.15;margin:0 0 16px 0;
+  font-size:14px;color:var(--ink-2)}
+.acc .inner p:last-child{margin-bottom:4px}
+.acc summary{transition:color .3s}
+.acc:hover summary{color:var(--accent)}
+
+/* 地图美化 */
+
+
+/* 地图：悬停边框变亮 */
+.map-box:hover{border-color:rgba(224,115,136,.42)}
+
+/* ===== 统一美化：画廊/歌单/游戏/留言/关于 ===== */
+/* 画廊卡片 */
+.works > *{transition:transform .45s cubic-bezier(.2,.8,.3,1),box-shadow .45s}
+
+/* 关于头像 */
+.avatar{transition:all .45s}
+.avatar:hover{transform:scale(1.06) rotate(3deg);box-shadow:0 10px 32px rgba(224,115,136,.32)}
+/* 联系列表 */
+.contact > div{transition:background .3s,padding .3s;border-radius:8px;padding:6px 10px}
+.contact > div:hover{background:rgba(224,115,136,.05)}
+/* 留言 */
+.guest-item{transition:background .3s;border-radius:12px;padding:18px 14px}
+.guest-item:hover{background:rgba(224,115,136,.04)}
+/* 歌单行 */
+.track{transition:all .3s}
+/* 游戏卡 */
+.book{transition:all .45s}
+.book:hover{box-shadow:0 16px 40px rgba(224,115,136,.12)}
 </style>
 
 
@@ -707,7 +765,7 @@ audio{-webkit-user-drag:none;pointer-events:auto}
     <div class="wrap">
       <div class="hero">
         <div class="hero-inner">
-          <div class="hero-top"><span></span>VTUBER · ILLUSTRATOR · WRITER<span></span></div>
+          <div class="hero-top"><span></span>VTUBER · DESIGNER · GAME DEVELOPER<span></span></div>
 
           <h1 class="hero-name">御<span>宅</span></h1>
           <div class="hero-latin">O T A R I N</div>
@@ -917,7 +975,14 @@ audio{-webkit-user-drag:none;pointer-events:auto}
           <div class="sec-title">创作日志</div>
           <div class="sec-desc">开发与日常</div>
         </div>
-        <div class="tl" id="tl"></div>
+        <div class="tl" id="tl">
+        <div class="tl-item"><div class="date">11.19</div><p>尝试做新的内容失败了，被打击到惹 ∏ω∏<br><br>把网站改了一遍 (๑-ㅅ-๑)...zzz<br><br>加了创作日志（就是这里 w）(∠ · ω&lt;)︵★<br><br>网站整体美化了一下，累但超级不错！/ᐠ &gt; ˕ &lt;マ੭<br><br>顺手修了一个bug，眠了(՞_ ̫ _՞)ᐝ੭</p></div>
+        <div class="tl-item"><div class="date">11.18</div><p>新增了几首 BGM，数数看新增多少~ ๑&gt;ᴗO๑</p></div>
+        <div class="tl-item"><div class="date">11.17</div><p>给游戏增加了音效和支线，也修改了一些其他内容 &gt;֊&lt;<br><br>灵感大发想出了新的玩法，完善了一下，感觉非常不错呀 ✧(◍˃̶ᗜ˂̶◍)✩</p></div>
+        <div class="tl-item"><div class="date">11.16</div><p>BGM 上传！⸜(๑&#x27;ᵕ&#x27;๑)⸝⋆*</p></div>
+        <div class="tl-item"><div class="date">11.15</div><p>重新制作了 galgame，修改了很多部分，眠……っω&lt;｡</p></div>
+        <div class="tl-item"><div class="date">11.06</div><p>网站终于上线了！<br><br>加了很多渲染？仔细看的话，会发现歌词会出现在旁边~<br><br>虽然没有声音，不是因为我不唱偷懒呀！魂淡！&lt;(｀^´)&gt;<br><br>细节就不说了，太多了。这一条也不是因为我偷懒不说！₍˄·͈༝·͈˄*₎◞ ̑̑<br><br>虽然修改了很多版，但是感觉还不错 ˵＞𖥦＜˵</p></div>
+      </div>
       </section>
     </div>
   </div>
