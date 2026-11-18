@@ -674,7 +674,11 @@ html[data-motion="off"] #preloader{display:none}
 </style>
 
 
-</head>
+<style>
+/* 防保存（右键/长按/拖动） */
+body{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+audio{-webkit-user-drag:none;pointer-events:auto}
+</style></head>
 <body>
 <video id="bgvid" autoplay muted loop playsinline preload="auto" src="assets/bg.mp4"></video>
 <div id="veil"></div>
@@ -1347,10 +1351,21 @@ window.addEventListener("load", function(){
     tl.innerHTML = html;
   }
 
+  const _blobCache = {};
   function playTrack(i){
     if(!audio || i < 0 || !tracks[i]) return;
     ti = i;
-    audio.src = tracks[i].src;
+    const realSrc = tracks[i].src;
+    if(_blobCache[realSrc]){
+      audio.src = _blobCache[realSrc];
+    } else {
+      audio.src = realSrc;
+      fetch(realSrc).then(r=>r.blob()).then(b=>{
+        const u = URL.createObjectURL(b);
+        _blobCache[realSrc] = u;
+        if(audio.src.indexOf(realSrc) >= 0){ audio.src = u; }
+      }).catch(()=>{});
+    }
     audio.loop = !!tracks[i].bgm;
     if(tracks[i].bgm){ if(!isIOS) fadeIn(audio, .38, 3000); }
     else audio.volume = .45;
@@ -1778,5 +1793,16 @@ route();
 </script>
 
 
-</body>
+<script>
+(function(){
+  /* 禁用右键 */
+  document.addEventListener('contextmenu', function(e){
+    if(e.target && (e.target.tagName === 'AUDIO' || e.target.closest('.player'))) e.preventDefault();
+  }, false);
+  /* 禁用长按保存 */
+  document.addEventListener('touchstart', function(e){
+    if(e.target && (e.target.tagName === 'AUDIO' || e.target.closest('.player'))) e.preventDefault();
+  }, {passive:false});
+})();
+</script></body>
 </html>
